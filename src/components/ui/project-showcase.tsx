@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { ArrowUpRight } from "lucide-react"
 
 interface ShowcaseItem {
@@ -9,7 +8,7 @@ interface ShowcaseItem {
   description: string
   year: string
   link: string
-  image: string
+  image?: string
 }
 
 interface ProjectShowcaseProps {
@@ -19,86 +18,10 @@ interface ProjectShowcaseProps {
 
 export function ProjectShowcase({ items, label = "Selected Work" }: ProjectShowcaseProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [smoothPosition, setSmoothPosition] = useState({ x: 0, y: 0 })
-  const [isVisible, setIsVisible] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    const lerp = (start: number, end: number, factor: number) => {
-      return start + (end - start) * factor
-    }
-
-    const animate = () => {
-      setSmoothPosition((prev) => ({
-        x: lerp(prev.x, mousePosition.x, 0.15),
-        y: lerp(prev.y, mousePosition.y, 0.15),
-      }))
-      animationRef.current = requestAnimationFrame(animate)
-    }
-
-    animationRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-    }
-  }, [mousePosition])
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      setMousePosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      })
-    }
-  }
-
-  const handleMouseEnter = (index: number) => {
-    setHoveredIndex(index)
-    setIsVisible(true)
-  }
-
-  const handleMouseLeave = () => {
-    setHoveredIndex(null)
-    setIsVisible(false)
-  }
 
   return (
-    <section ref={containerRef} onMouseMove={handleMouseMove} className="relative w-full">
+    <section className="relative w-full">
       <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mb-6">{label}</p>
-
-      <div
-        className="pointer-events-none fixed z-50 overflow-hidden rounded-xl shadow-2xl"
-        style={{
-          left: containerRef.current?.getBoundingClientRect().left ?? 0,
-          top: containerRef.current?.getBoundingClientRect().top ?? 0,
-          transform: `translate3d(${smoothPosition.x + 20}px, ${smoothPosition.y - 100}px, 0)`,
-          opacity: isVisible ? 1 : 0,
-          scale: isVisible ? 1 : 0.8,
-          transition: "opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), scale 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
-        <div className="relative w-[260px] h-[160px] bg-secondary rounded-xl overflow-hidden">
-          {items.map((item, index) => (
-            <img
-              key={item.title}
-              src={item.image || "/placeholder.svg"}
-              alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out"
-              style={{
-                opacity: hoveredIndex === index ? 1 : 0,
-                scale: hoveredIndex === index ? 1 : 1.08,
-                filter: hoveredIndex === index ? "none" : "blur(8px)",
-              }}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-        </div>
-      </div>
 
       <div className="space-y-0">
         {items.map((item, index) => (
@@ -106,8 +29,8 @@ export function ProjectShowcase({ items, label = "Selected Work" }: ProjectShowc
             key={item.title}
             href={item.link}
             className="group block cursor-pointer"
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
           >
             <div className="relative py-4 border-t border-border/60 transition-all duration-300 ease-out">
               <div

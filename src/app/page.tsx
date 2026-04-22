@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react"
 import { motion, useInView } from "framer-motion"
 import { Waves } from "@/components/ui/wave-background"
 import { LiquidButton } from "@/components/ui/liquid-glass-button"
-import { ContainerScroll } from "@/components/ui/container-scroll-animation"
+
 import { FileTree } from "@/components/ui/file-tree"
 import { ProjectShowcase } from "@/components/ui/project-showcase"
 import { ClipPathLinks } from "@/components/ui/clip-path-links"
@@ -257,37 +257,12 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ── container scroll transition ── */}
-      <ContainerScroll
-        titleComponent={
-          <div className="text-center mb-4">
-            <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mb-3">
-              — work
-            </p>
-            <p className="text-foreground/60 text-sm font-light italic">
-              projects, research, and everything in between
-            </p>
-          </div>
-        }
-      >
-        <div className="w-full h-full flex items-center justify-center bg-[#0D0D0D] rounded-xl overflow-hidden">
-          <div className="grid grid-cols-3 gap-4 px-8 w-full">
-            {projects.map((p, i) => (
-              <motion.div
-                key={p.title}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 + 0.2 }}
-                className="border border-border/40 rounded-lg p-4 bg-secondary/30"
-              >
-                <p className="text-foreground/80 text-sm font-light mb-1">{p.title}</p>
-                <p className="text-muted-foreground text-xs leading-relaxed italic">{p.description}</p>
-                <p className="text-muted-foreground/50 text-xs font-mono mt-2">{p.year}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </ContainerScroll>
+      {/* ── section divider ── */}
+      <div className="flex items-center justify-center py-16 px-10">
+        <div className="flex-1 border-t border-border/20" />
+        <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mx-6">work</p>
+        <div className="flex-1 border-t border-border/20" />
+      </div>
 
       {/* ── main two-column layout ── */}
       <div className="flex min-h-screen">

@@ -156,7 +156,7 @@ export const ClipPathLinks = () => {
         <LinkBox Icon={FaLinkedinIn} href="https://www.linkedin.com/in/leo-yang-a0b193363/" />
       </div>
       <div className="grid grid-cols-2 divide-x divide-border">
-        <LinkBox Icon={SiGithub} href="https://github.com/leoy1016" />
+        <LinkBox Icon={SiGithub} href="https://github.com/lyfyang" />
         <EmailBox Icon={MdOutlineEmail} />
       </div>
     </div>
