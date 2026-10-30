@@ -5,7 +5,7 @@ const W = "var(--ink)"
 const Y = "var(--accent)"
 const M = "var(--muted)"
 
-const text = { fill: W, fontSize: 17, fontFamily: "var(--font-jakarta)", fontWeight: 700 } as const
+const text = { fill: W, fontSize: 17, fontFamily: "var(--font-inter-tight)", fontWeight: 700 } as const
 
 export type DrawingId = "calibration" | "trajectory" | "ratings" | "hierarchy" | "charging" | "sitemap"
 

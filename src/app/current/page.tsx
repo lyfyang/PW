@@ -50,15 +50,9 @@ export default function CurrentPage() {
         </article>
 
         <article className="entry">
-          <figure className="entry__media shutter" data-reveal style={{ margin: 0 }}>
-            <img
-              src="/img/hopbuilds.jpg"
-              alt="HopBuilds, the Johns Hopkins Software Engineering Club: “We build software for Hopkins”, beside a terminal window"
-              width={2000}
-              height={1162}
-              loading="lazy"
-            />
-          </figure>
+          <div className="entry__media entry__media--card" data-reveal>
+            <span className="card-text">Johns Hopkins Software Engineering Club</span>
+          </div>
           <div className="entry__text">
             <h2 className="display" data-reveal style={delay(1)}>
               <span aria-hidden="true">*****</span>

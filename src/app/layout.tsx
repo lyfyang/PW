@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 import { Reveal } from "@/components/reveal";
-import { MotionProvider, ScrollProgress } from "@/components/motion";
+import { MotionProvider } from "@/components/motion";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter_Tight({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  variable: "--font-jakarta",
+  weight: ["500", "700"],
+  variable: "--font-inter-tight",
 });
 
 export const metadata: Metadata = {
   title: "Leo Yang",
   description:
-    "Leo Yang studies applied math and computer science at Johns Hopkins and builds lab instruments, prediction models and web apps.",
+    "Leo Yang studies applied math and computer science at Johns Hopkins, is interested in startups and where hardware meets software, and builds prediction models and web apps.",
 };
 
 export default function RootLayout({
@@ -22,15 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jakarta.variable} suppressHydrationWarning>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
       </head>
       <body>
-        <MotionProvider>
-          <ScrollProgress />
-          {children}
-        </MotionProvider>
+        <SmoothScroll />
+        <MotionProvider>{children}</MotionProvider>
         <Reveal />
       </body>
     </html>

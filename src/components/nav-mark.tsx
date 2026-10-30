@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { scrollToY } from "@/components/smooth-scroll"
 
-// The name stays pinned in the corner; on the home page it scrolls back to the top.
+// A small square in the corner that opens into the name on hover; on the home page it returns to the top.
 export function NavMark() {
   const pathname = usePathname()
 
@@ -15,11 +16,10 @@ export function NavMark() {
       onClick={(e) => {
         if (pathname !== "/") return
         e.preventDefault()
-        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
+        scrollToY(0)
       }}
     >
-      Leo Yang
+      <span className="nav__mark-name">Leo Yang</span>
     </Link>
   )
 }

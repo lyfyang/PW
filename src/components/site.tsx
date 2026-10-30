@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { NavMark } from "@/components/nav-mark"
-import { NavLinks } from "@/components/motion"
+import { Menu } from "@/components/menu"
+import { CornerName } from "@/components/fx"
 
 export const EMAIL = "leoyyf2007@gmail.com"
 
@@ -14,37 +15,38 @@ export function SiteNav() {
   return (
     <nav className="nav" aria-label="Main">
       <NavMark />
-      <NavLinks
+      <Menu
         links={[
-          { href: "/#research", label: "Research" },
-          { href: "/#projects", label: "Projects" },
+          { href: "/#projects", label: "Work" },
+          { href: "/#awards", label: "Awards" },
+          { href: "/#experience", label: "Experience" },
           { href: "/current", label: "Now" },
           { href: "/#contact", label: "Contact" },
         ]}
+        email={EMAIL}
+        socials={SOCIALS}
       />
     </nav>
   )
 }
 
-export function SiteFooter({ credits }: { credits?: React.ReactNode }) {
+// The close: one small line, then the name in the corners closes up in the middle.
+export function SiteFooter() {
   return (
     <footer className="footer">
-      <p className="credits">
-        {credits && <>Pictures and footage: {credits}; all via Wikimedia Commons. </>}
-        Drawings, renders, figures and screenshots are my own.
-      </p>
       <div className="footer__line">
-        <span>Leo Yang · Baltimore, MD · Irvine, CA</span>
+        <span>Leo Yang, applied math and CS at Johns Hopkins</span>
         <ul className="footer__links">
-          <li><Link className="link" href="/#research">Research</Link></li>
-          <li><Link className="link" href="/#projects">Projects</Link></li>
-          <li><Link className="link" href="/current">Now</Link></li>
+          <li><Link href="/#projects">Work</Link></li>
+          <li><Link href="/#awards">Awards</Link></li>
+          <li><Link href="/current">Now</Link></li>
           {SOCIALS.map((s) => (
-            <li key={s.label}><a className="link" href={s.href}>{s.label}</a></li>
+            <li key={s.label}><a href={s.href}>{s.label}</a></li>
           ))}
         </ul>
-        <span className="footer__year">2026</span>
+        <span className="footer__end">Drawings, renders and screenshots are my own.</span>
       </div>
+      <CornerName first="leo" last="yang" />
     </footer>
   )
 }
