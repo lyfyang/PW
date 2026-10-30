@@ -5,7 +5,7 @@ const W = "var(--ink)"
 const Y = "var(--accent)"
 const M = "var(--muted)"
 
-const text = { fill: W, fontSize: 17, fontFamily: "var(--font-chivo)", fontWeight: 700 } as const
+const text = { fill: W, fontSize: 17, fontFamily: "var(--font-jakarta)", fontWeight: 700 } as const
 
 export type DrawingId = "calibration" | "trajectory" | "ratings" | "hierarchy" | "charging" | "sitemap"
 
@@ -17,6 +17,9 @@ export function Drawing({ id, label }: { id: DrawingId; label: string }) {
     </svg>
   )
 }
+
+const FIGURE_8 =
+  "M205 250 C245 292 290 304 330 298 C384 288 386 212 330 202 C290 196 245 208 205 250 C165 292 120 306 82 298 C24 284 24 216 82 202 C120 194 165 208 205 250 Z"
 
 const DRAWINGS: Record<DrawingId, React.ReactNode> = {
   // Reliability diagram: predicted probability against observed frequency.
@@ -37,7 +40,7 @@ const DRAWINGS: Record<DrawingId, React.ReactNode> = {
   trajectory: (
     <g>
       <path
-        d="M205 250 C245 292 290 304 330 298 C384 288 386 212 330 202 C290 196 245 208 205 250 C165 292 120 306 82 298 C24 284 24 216 82 202 C120 194 165 208 205 250 Z"
+        d={FIGURE_8}
         stroke={W} strokeWidth="4" strokeDasharray="10 9" fill="none"
       />
       <circle cx="92" cy="250" r="38" fill={W} />
@@ -46,6 +49,9 @@ const DRAWINGS: Record<DrawingId, React.ReactNode> = {
       <text x="92" y="350" textAnchor="middle" {...text}>Earth</text>
       <text x="330" y="350" textAnchor="middle" {...text}>Moon</text>
       <text x="205" y="150" textAnchor="middle" {...text}>free-return figure 8</text>
+      <circle className="drawing__craft" r="8" fill={Y}>
+        <animateMotion dur="10s" repeatCount="indefinite" rotate="auto" path={FIGURE_8} />
+      </circle>
     </g>
   ),
   // Win probability as a function of the rating gap.

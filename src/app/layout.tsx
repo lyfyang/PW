@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Chivo } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Reveal } from "@/components/reveal";
+import { MotionProvider, ScrollProgress } from "@/components/motion";
 import "./globals.css";
 
-const chivo = Chivo({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-chivo",
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -21,12 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={chivo.variable} suppressHydrationWarning>
+    <html lang="en" className={jakarta.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
       </head>
       <body>
-        {children}
+        <MotionProvider>
+          <ScrollProgress />
+          {children}
+        </MotionProvider>
         <Reveal />
       </body>
     </html>

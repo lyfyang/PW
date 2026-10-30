@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { NavMark } from "@/components/nav-mark"
+import { NavLinks } from "@/components/motion"
 
 export const EMAIL = "leoyyf2007@gmail.com"
 
@@ -13,12 +14,14 @@ export function SiteNav() {
   return (
     <nav className="nav" aria-label="Main">
       <NavMark />
-      <ul className="nav__links">
-        <li><Link className="link" href="/#research">Research</Link></li>
-        <li><Link className="link" href="/#projects">Projects</Link></li>
-        <li><Link className="link" href="/current">Now</Link></li>
-        <li><Link className="link" href="/#contact">Contact</Link></li>
-      </ul>
+      <NavLinks
+        links={[
+          { href: "/#research", label: "Research" },
+          { href: "/#projects", label: "Projects" },
+          { href: "/current", label: "Now" },
+          { href: "/#contact", label: "Contact" },
+        ]}
+      />
     </nav>
   )
 }
