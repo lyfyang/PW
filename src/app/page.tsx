@@ -1,352 +1,370 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
-import { motion, useInView } from "framer-motion"
-import { Waves } from "@/components/ui/wave-background"
-import { LiquidButton } from "@/components/ui/liquid-glass-button"
-
-import { FileTree } from "@/components/ui/file-tree"
-import { ProjectShowcase } from "@/components/ui/project-showcase"
-import { ClipPathLinks } from "@/components/ui/clip-path-links"
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
+import { Drawing, type DrawingId } from "@/components/drawings"
+import { EMAIL, SOCIALS, SiteFooter, SiteNav } from "@/components/site"
 
 // ─── data ────────────────────────────────────────────────────────────────────
 
-const navTree = [
-  {
-    name: "leo yang",
-    type: "folder" as const,
-    children: [
-      { name: "bio.md", type: "file" as const, extension: "md", id: "bio" },
-      {
-        name: "projects",
-        type: "folder" as const,
-        children: [
-          { name: "claudius.md", type: "file" as const, extension: "md", id: "proj-0" },
-          { name: "meridian.md", type: "file" as const, extension: "md", id: "proj-1" },
-          { name: "lattice.md", type: "file" as const, extension: "md", id: "proj-2" },
-        ],
-      },
-      {
-        name: "research",
-        type: "folder" as const,
-        children: [
-          { name: "hf-epr.md", type: "file" as const, extension: "md", id: "res-0" },
-          { name: "attention-multimodal.md", type: "file" as const, extension: "md", id: "res-1" },
-          { name: "sparse-repr.md", type: "file" as const, extension: "md", id: "res-2" },
-        ],
-      },
-      {
-        name: "socials",
-        type: "folder" as const,
-        children: [
-          { name: "instagram.lnk", type: "file" as const, extension: "md", id: "ig" },
-          { name: "linkedin.lnk", type: "file" as const, extension: "md", id: "li" },
-          { name: "github.lnk", type: "file" as const, extension: "md", id: "li" },
-          { name: "email.lnk", type: "file" as const, extension: "md", id: "li" },
-        ],
-      },
-    ],
-  },
-]
+type Picture = { src: string; alt: string } | { draw: DrawingId; alt: string }
 
-const projects = [
+const projects: {
+  name: string
+  year: string
+  description: string
+  link?: { href: string; label: string }
+  picture: Picture
+}[] = [
   {
-    title: "Claudius",
-    description: "Agentic CLI for natural language software engineering workflows.",
+    name: "StrokeShield",
+    year: "2026",
+    description:
+      "Voice-guided BE-FAST stroke screening built at HopHacks. In-browser MediaPipe computer vision checks face and arm symmetry, an ElevenLabs voice agent walks the user through each step, and a FastAPI backend sends an SMS alert when checks flag risk.",
+    link: { href: "https://www.strokeshield.health/", label: "Open the demo" },
+    picture: { src: "/img/demo-strokeshield.jpg", alt: "StrokeShield's start screen: “A guided BE-FAST check, in about two minutes”, with the four checks listed" },
+  },
+  {
+    name: "Meridian",
+    year: "2024",
+    description:
+      "Building a quantitative execution system for regulated binary derivatives markets using ML-based probability calibration, stochastic intra-bar simulation, and adaptive position sizing with live order routing via REST API.",
+    picture: { draw: "calibration", alt: "Drawing of a calibration curve: predicted probability against observed frequency" },
+  },
+  {
+    name: "Artemis II Live Trajectory Dashboard",
     year: "2025",
-    link: "#",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop",
+    description:
+      "Real-time trajectory, telemetry, and mission data for NASA's Artemis II flight, built with a team of 7 on Node.js and Vercel for the 2025 NASA App Development Challenge. Led backend, logistics, and outreach.",
+    link: { href: "https://nasa-app-zeta.vercel.app", label: "Open the dashboard" },
+    picture: { draw: "trajectory", alt: "Drawing of Artemis II's free-return path from Earth around the Moon and back" },
   },
   {
-    title: "Meridian",
-    description: "Spatial computing interface toolkit for ambient display systems.",
-    year: "2024",
-    link: "#",
-    image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Lattice",
-    description: "Real-time distributed state synchronization for collaborative tools.",
-    year: "2024",
-    link: "#",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop",
-  },
-]
-
-const research = [
-  {
-    title: "High Field Electron Paramagnetic Resonance Prototyping",
-    description: "Engineered a precision rotating cryogenic EPR sample holder achieving a 99.9% cost reduction, enabling high-sensitivity spin-state characterization at sub-kelvin temperatures in collaboration with UCSB's Institute for Terahertz Technology and Science.",
+    name: "Match Prediction via Optimized Player Ratings",
     year: "2025",
-    link: "/research/hf-epr",
-    image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&auto=format&fit=crop",
+    description:
+      "With Dr. Benoit Legat (UCLouvain): a rating-based tennis match predictor on Universal Tennis Rating data, fitting player ratings and outcome weights by minimizing ranking error and validating against held-out matches.",
+    picture: { draw: "ratings", alt: "Drawing of win probability rising with the rating gap between two players" },
   },
   {
-    title: "Attention Mechanisms in Multimodal Systems",
-    description: "Cross-modal attention routing and its effect on grounding fidelity in vision-language models.",
-    year: "2024",
-    link: "#",
-    image: "https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?w=600&auto=format&fit=crop",
+    name: "Olympic Sport Selection Model",
+    year: "2025",
+    description:
+      "HiMCM Meritorious Winner. A two-layer Analytic Hierarchy Process model scoring candidate Olympic sports across 23 features from IOC and Kaggle data, matching historical selections with a Pearson correlation of 0.9955.",
+    picture: { draw: "hierarchy", alt: "Drawing of the hierarchy: the goal, five criteria, and candidate sports" },
   },
   {
-    title: "Sparse Representation Learning",
-    description: "Dictionary learning approaches for interpretable feature decomposition in transformer residual streams.",
-    year: "2023",
-    link: "#",
-    image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&auto=format&fit=crop",
+    name: "Matrix Charging Systems",
+    year: "2025",
+    description:
+      "Led team of 3 in brainstorming and development, and outreach for a novel EV charging concept using automated guided vehicles, with the focus of improving EV user retention in the US by promoting EV charging infrastructure accessibility and reducing space constraints of charging piles. Submitted to Conrad Challenge 2025.",
+    picture: { draw: "charging", alt: "Drawing of a parking lot where a charging robot drives to the car" },
   },
 ]
 
-const sectionIds = ["bio", "projects", "research", "socials"]
-
-// ─── fade-in wrapper ──────────────────────────────────────────────────────────
-
-function FadeIn({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode
-  delay?: number
-  className?: string
-}) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: false, amount: 0.05 })
-
+function PictureView({ picture, className }: { picture: Picture; className?: string }) {
+  if ("draw" in picture) {
+    return (
+      <div className={className}>
+        <Drawing id={picture.draw} label={picture.alt} />
+      </div>
+    )
+  }
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 18 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+    <img
       className={className}
-    >
-      {children}
-    </motion.div>
+      src={picture.src}
+      alt={picture.alt}
+      width={1440}
+      height={900}
+      loading="lazy"
+    />
   )
 }
 
 // ─── main ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [activeFile, setActiveFile] = useState<string>("bio")
+  const [active, setActive] = useState(0)
+  const rowRefs = useRef<(HTMLLIElement | null)[]>([])
+  const videoRef = useRef<HTMLVideoElement>(null)
 
-  const bioRef = useRef<HTMLDivElement>(null)
-  const projectsRef = useRef<HTMLDivElement>(null)
-  const researchRef = useRef<HTMLDivElement>(null)
-  const socialsRef = useRef<HTMLDivElement>(null)
-
-  const sectionRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    bio: bioRef,
-    "proj-0": projectsRef,
-    "proj-1": projectsRef,
-    "proj-2": projectsRef,
-    "res-0": researchRef,
-    "res-1": researchRef,
-    "res-2": researchRef,
-    ig: socialsRef,
-    li: socialsRef,
-    projects: projectsRef,
-    research: researchRef,
-    socials: socialsRef,
-  }
-
-  const handleFileClick = (id: string) => {
-    setActiveFile(id)
-    const ref = sectionRefs[id]
-    if (ref?.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
-  }
-
-  // track active section on scroll
+  // the row that crosses the middle of the viewport becomes the active one
   useEffect(() => {
-    const sections: { id: string; ref: React.RefObject<HTMLDivElement | null> }[] = [
-      { id: "bio", ref: bioRef },
-      { id: "proj-0", ref: projectsRef },
-      { id: "res-0", ref: researchRef },
-      { id: "ig", ref: socialsRef },
-    ]
-
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const matched = sections.find((s) => s.ref.current === entry.target)
-            if (matched) setActiveFile(matched.id)
-          }
-        })
+        for (const e of entries) {
+          if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.index))
+        }
       },
-      { threshold: 0.3 }
+      { rootMargin: "-48% 0px -48% 0px" }
     )
+    rowRefs.current.forEach((el) => el && io.observe(el))
+    return () => io.disconnect()
+  }, [])
 
-    sections.forEach(({ ref }) => {
-      if (ref.current) observer.observe(ref.current)
+  // the loop rests under reduced motion and off screen
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !reduce.matches) v.play().catch(() => {})
+      else v.pause()
     })
-
-    return () => observer.disconnect()
+    io.observe(v)
+    return () => io.disconnect()
   }, [])
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* ── hero ── */}
-      <section className="relative h-screen flex flex-col items-start justify-end overflow-hidden">
-        {/* wave background */}
-        <div className="absolute inset-0 z-0">
-          <Waves strokeColor="#3a3a3a" backgroundColor="#0A0A0A" pointerSize={0} />
-        </div>
+    <>
+      <SiteNav />
 
-        {/* gradient overlay */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/20 via-transparent to-background" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-background/60 to-transparent" />
-
-        {/* hero content */}
-        <div className="relative z-20 px-10 pb-16 max-w-xl">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <p className="text-foreground/50 text-xs font-mono tracking-widest uppercase mb-4">
-              portfolio
-            </p>
-            <h1
-              className="text-foreground/90 font-light leading-none mb-3"
-              style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "1.1rem" }}
-            >
-              Leo Yang
-            </h1>
-            <p className="text-muted-foreground text-xs leading-relaxed max-w-xs mb-8 italic" style={{ lineHeight: "1.7" }}>
-              researcher and builder. interested in language, cognition, and the systems that emerge at their intersection.
-            </p>
-
-            <div className="flex items-center gap-3">
-              <LiquidButton
-                size="sm"
-                onClick={() => handleFileClick("ig")}
-                className="text-foreground/70 text-xs"
-              >
-                instagram
-              </LiquidButton>
-              <LiquidButton
-                size="sm"
-                onClick={() => handleFileClick("li")}
-                className="text-foreground/70 text-xs"
-              >
-                linkedin
-              </LiquidButton>
+      <main>
+        {/* ── hero ── */}
+        <section className="hero" aria-labelledby="title">
+          <div className="hero__stage">
+            <div className="hero__picture blueprint">
+              <img
+                src="/img/epr-cross-section.png"
+                alt="Cross-section of the rotating EPR sample holder: bevel gears turn the sample inside the modulation coil"
+                width={1230}
+                height={1228}
+                fetchPriority="high"
+              />
             </div>
-          </motion.div>
-        </div>
+            <div className="hero__text">
+              <h1 id="title" className="display rise">Leo<br />Yang</h1>
+              <div className="hero__aside rise" style={{ "--i": 2 } as React.CSSProperties}>
+                <p>
+                  Applied math and computer science at Johns Hopkins. I build lab instruments, prediction models
+                  and web apps.
+                </p>
+                <a className="button" href={`mailto:${EMAIL}`}>Email me</a>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* scroll cue */}
-        <motion.div
-          className="absolute bottom-8 right-10 z-20 flex flex-col items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-        >
-          <span className="text-muted-foreground text-xs font-mono tracking-widest" style={{ fontSize: "0.6rem" }}>
-            scroll
-          </span>
-          <motion.div
-            className="w-px h-8 bg-gradient-to-b from-muted-foreground/40 to-transparent"
-            animate={{ scaleY: [1, 0.4, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
-      </section>
+        {/* ── research ── */}
+        <section id="research" aria-label="Research">
+          <div className="frame">
+            <div className="frame__bg frame__bg--figure blueprint">
+              <img
+                src="/img/epr-top-view.png"
+                alt="Top view of the sample holder: the sample sits at the centre of the turning gear"
+                width={1242}
+                height={1076}
+                loading="lazy"
+              />
+            </div>
+            <article className="card" data-reveal>
+              <h2>Rotating EPR sample holder</h2>
+              <p>UCSB Sherwin Group, 2025</p>
+              <p className="card__fact">$20,000 instrument, rebuilt for under $20</p>
+              <img
+                className="card__thumb card__thumb--plot"
+                src="/img/epr-spectra.png"
+                alt="EPR spectra at orientations from 5° to 200°, the resonance shifting with angle"
+                width={598}
+                height={470}
+                loading="lazy"
+              />
+              <p>
+                A fully mechanical holder for a 95–240 GHz spectrometer: bevel gears turn the sample a full 360° below
+                10 K, and two resistances report its angle.
+              </p>
+              <Link className="button button--blue" href="/research/hf-epr">Read the research</Link>
+            </article>
+          </div>
 
-      {/* ── section divider ── */}
-      <div className="flex items-center justify-center py-16 px-10">
-        <div className="flex-1 border-t border-border/20" />
-        <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mx-6">work</p>
-        <div className="flex-1 border-t border-border/20" />
-      </div>
+          <div className="frame frame--second">
+            <div className="frame__bg frame__bg--plan">
+              <img
+                src="/img/torii-blueprint.jpg"
+                alt="Blueprint elevations of Itsukushima's great torii, front and side, with dimensions"
+                width={2400}
+                height={1610}
+                loading="lazy"
+              />
+            </div>
+            <article className="card" data-reveal>
+              <h3 data-reveal style={{ "--i": 1 } as React.CSSProperties}>Itsukushima Shrine, in LEGO</h3>
+              <p>Pioneer Research Program, 2025</p>
+              <p className="card__fact">A heritage site for a line built on skylines</p>
+              <img
+                className="card__thumb"
+                src="/img/lego-skyline.jpg"
+                alt="My digital LEGO model: the torii, worship hall, Senjokaku pavilion and five-storied pagoda on one base"
+                width={1898}
+                height={915}
+                loading="lazy"
+              />
+              <p>
+                How LEGO&apos;s product and marketing frameworks decide which cultures get represented. I audited the
+                Skyline line&apos;s bias toward Western megacities, then designed a 450–750 piece model of the
+                UNESCO-listed shrine within in-production parts and colours.
+              </p>
+            </article>
+          </div>
+        </section>
 
-      {/* ── main two-column layout ── */}
-      <div className="flex min-h-screen">
-        {/* sidebar */}
-        <aside className="w-64 shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-border/40 p-4 flex flex-col">
-          <FileTree
-            data={navTree}
-            className="flex-1 border-none bg-transparent p-0"
-            onFileClick={handleFileClick}
-            activeFile={activeFile}
-          />
+        {/* ── projects ── */}
+        <section id="projects" className="projects" aria-labelledby="projects-title">
+          <div className="projects__picture" aria-hidden="true">
+            {projects.map((p, i) => (
+              <PictureView key={p.name} picture={p.picture} className={i === active ? "is-active" : undefined} />
+            ))}
+          </div>
+          <div className="projects__body">
+            <h2 id="projects-title" className="display" data-reveal>Projects</h2>
+            <ul className="plist">
+              {projects.map((p, i) => (
+                <li
+                  key={p.name}
+                  ref={(el) => { rowRefs.current[i] = el }}
+                  data-index={i}
+                  className={`plist__item${i === active ? " is-active" : ""}`}
+                  onMouseEnter={() => setActive(i)}
+                >
+                  <h3 className="plist__row">
+                    <span>{p.name}</span>
+                    <span>{p.year}</span>
+                  </h3>
+                  <p>{p.description}</p>
+                  {p.link && (
+                    <a
+                      className="link"
+                      href={p.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onFocus={() => setActive(i)}
+                    >
+                      {p.link.label} →
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
 
-          <div className="mt-auto pt-4 border-t border-border/30">
-            <p className="text-muted-foreground font-mono" style={{ fontSize: "0.6rem", letterSpacing: "0.1em" }}>
-              leo yang / 2025
+        {/* ── currently working on ── */}
+        <section className="now" aria-labelledby="now-title">
+          <div className="now__text">
+            <h2 id="now-title" className="display" data-reveal>
+              <Link className="link" href="/current">Currently working on →</Link>
+            </h2>
+            <p data-reveal style={{ "--i": 1 } as React.CSSProperties}>
+              Y Clonebinator, and a stealth project with the Johns Hopkins Software Engineering Club.
             </p>
           </div>
-        </aside>
+          <Link href="/current" className="now__picture" data-reveal style={{ "--i": 2 } as React.CSSProperties}>
+            <img
+              src="/img/demo-clonebinator.jpg"
+              alt="Y Clonebinator: “Someone already built your idea”, with a box to describe a startup idea"
+              width={1440}
+              height={900}
+              loading="lazy"
+            />
+          </Link>
+        </section>
 
-        {/* content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto px-12 py-20 space-y-28">
+        {/* ── experience and education ── */}
+        <section id="experience" className="about" aria-labelledby="about-title">
+          <h2 id="about-title" className="display" data-reveal>Experience<br />&amp; education</h2>
+          <ol className="about__list">
+            <li className="about__item">
+              <figure className="about__media shutter" data-reveal>
+                <video
+                  ref={videoRef}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  poster="/img/3d-printing-time-lapse-2026-poster.jpg"
+                  width={854}
+                  height={480}
+                  aria-label="Time-lapse of a 3D printer laying down a part"
+                >
+                  <source src="/img/3d-printing-time-lapse-2026.webm" type="video/webm" />
+                </video>
+              </figure>
+              <h3 data-reveal style={{ "--i": 1 } as React.CSSProperties}>Summer Researcher, Sherwin Group</h3>
+              <p className="about__role" data-reveal style={{ "--i": 2 } as React.CSSProperties}>UC Santa Barbara · Jun–Aug 2025</p>
+              <p>
+                Designed and 3D-printed a rotating cryogenic sample holder for a 95–240 GHz EPR spectrometer.
+                Co-authored the paper and presented it to 100+ attendees.
+              </p>
+            </li>
+            <li className="about__item">
+              <div className="about__media shutter" data-reveal>
+                <Drawing id="sitemap" label="Drawing of the nonprofit's rebuilt site map" />
+              </div>
+              <h3 data-reveal style={{ "--i": 1 } as React.CSSProperties}>Web Development &amp; SEO Lead, Finally Family Homes</h3>
+              <p className="about__role" data-reveal style={{ "--i": 2 } as React.CSSProperties}>Nonprofit · Nov 2024 – Jan 2026</p>
+              <p>
+                Rebuilt navigation and backend systems as the site grew to 1,000+ monthly visits, and led its
+                migration to a Vercel-hosted build with volunteer developers.
+              </p>
+            </li>
+            <li className="about__item">
+              <div className="about__media shutter" data-reveal>
+                <img
+                  src="/img/jhu-campus.jpg"
+                  alt="Aerial view of Johns Hopkins' Homewood campus: the brick quad, its cupolas and the library steps"
+                  width={1800}
+                  height={1011}
+                />
+              </div>
+              <h3 data-reveal style={{ "--i": 1 } as React.CSSProperties}>Johns Hopkins University</h3>
+              <p className="about__role" data-reveal style={{ "--i": 2 } as React.CSSProperties}>Whiting School of Engineering</p>
+              <p>B.S. Applied Mathematics &amp; Statistics and B.S. Computer Science.</p>
+            </li>
+            <li className="about__item">
+              <div className="about__media shutter" data-reveal>
+                <img
+                  src="/img/smes-commencement.jpg"
+                  alt="St. Margaret's commencement on the lawn before the Darcy Rice Center for the Arts, graduates in white"
+                  width={1800}
+                  height={1200}
+                  style={{ objectPosition: "47% 60%" }}
+                />
+              </div>
+              <h3 data-reveal style={{ "--i": 1 } as React.CSSProperties}>St. Margaret&apos;s Episcopal School</h3>
+              <p className="about__role" data-reveal style={{ "--i": 2 } as React.CSSProperties}>San Juan Capistrano</p>
+              <p>Salutatorian.</p>
+            </li>
+          </ol>
+        </section>
 
-            {/* bio */}
-            <section ref={bioRef} id="bio">
-              <FadeIn>
-                <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mb-8">
-                  bio.md
-                </p>
-                <div className="space-y-4">
-                  <p className="text-foreground/80 text-sm leading-relaxed font-light italic" style={{ lineHeight: "1.85" }}>
-                    i build things at the edges of language and computation. currently exploring how
-                    neural representations scale, compose, and occasionally surprise us.
-                  </p>
-                  <p className="text-foreground/60 text-sm leading-relaxed font-light italic" style={{ lineHeight: "1.85" }}>
-                    previously: ml research at various labs, some compilers work, a stint writing frontend
-                    for longer than i care to admit. i find most interesting the places where tools become
-                    extensions of thought rather than just instruments of it.
-                  </p>
-                  <p className="text-foreground/60 text-sm leading-relaxed font-light italic" style={{ lineHeight: "1.85" }}>
-                    outside of work: film, long-form essays, climbing, and the occasional over-engineered
-                    personal project.
-                  </p>
-                </div>
-              </FadeIn>
-            </section>
-
-            {/* divider */}
-            <div className="border-t border-border/30" />
-
-            {/* projects */}
-            <section ref={projectsRef} id="projects">
-              <FadeIn delay={0.05}>
-                <ProjectShowcase items={projects} label="projects" />
-              </FadeIn>
-            </section>
-
-            {/* divider */}
-            <div className="border-t border-border/30" />
-
-            {/* research */}
-            <section ref={researchRef} id="research">
-              <FadeIn delay={0.05}>
-                <ProjectShowcase items={research} label="research" />
-              </FadeIn>
-            </section>
-
-            {/* divider */}
-            <div className="border-t border-border/30" />
-
-            {/* socials */}
-            <section ref={socialsRef} id="socials">
-              <FadeIn delay={0.05}>
-                <p className="text-muted-foreground text-xs font-mono tracking-widest uppercase mb-8">
-                  socials
-                </p>
-                <ClipPathLinks />
-              </FadeIn>
-            </section>
-
-            <div className="h-20" />
+        {/* ── contact ── */}
+        <section id="contact" className="contact" aria-labelledby="contact-title">
+          <h2 id="contact-title" data-reveal>Write to me about research, internships, or something you want built.</h2>
+          <a className="contact__email display" data-reveal style={{ "--i": 1 } as React.CSSProperties} href={`mailto:${EMAIL}`}>
+            leoyyf2007@<br className="br" />gmail.com
+          </a>
+          <div className="contact__foot" data-reveal style={{ "--i": 2 } as React.CSSProperties}>
+            <span>Baltimore, MD · Irvine, CA</span>
+            <ul>
+              {SOCIALS.map((s) => (
+                <li key={s.label}>
+                  <a className="link" href={s.href}>{s.label}</a>
+                </li>
+              ))}
+            </ul>
           </div>
-        </main>
-      </div>
-    </div>
+        </section>
+      </main>
+
+      <SiteFooter
+        credits={
+          <>
+            <a className="link" href="https://commons.wikimedia.org/wiki/File:3D_printing_time-lapse_2026.webm">“3D printing time-lapse 2026”</a>{" "}
+            by BoardGamesN3Dprint, CC0
+          </>
+        }
+      />
+    </>
   )
 }
